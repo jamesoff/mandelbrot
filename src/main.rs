@@ -4,9 +4,6 @@ extern crate crossbeam;
 extern crate num_cpus;
 
 use num::Complex;
-use image::ColorType;
-use image::png::PNGEncoder;
-use std::fs::File;
 use std::str::FromStr;
 use std::io::Write;
 
@@ -106,11 +103,20 @@ fn escape_time(c: Complex<f64>, limit: u32) -> Option<u32> {
 
 
 fn write_image(filename: &str, pixels: &[u8], bounds: (usize, usize)) -> Result<(), std::io::Error> {
-    let output = File::create(filename)?;
+    let colour_gradient = colours::gradient::interpolate_colours(
+        &colours::gradient::RGBColour { red: 255, green: 153, blue: 0},
+        &colours::gradient::RGBColour { red: 35, green: 47, blue: 62 },
+        256);
 
-    let encoder = PNGEncoder::new(output);
-    encoder.encode(&pixels, bounds.0 as u32, bounds.1 as u32,
-                   ColorType::Gray(8))?;
+    let mut img_buf: image::RgbImage = image::ImageBuffer::new(bounds.0 as u32, bounds.1 as u32);
+
+    for (x, y, pixel) in img_buf.enumerate_pixels_mut() {
+        let index = y as usize * bounds.0 + x as usize;
+        let colour = &colour_gradient[pixels[index] as usize];
+        *pixel = image::Rgb([colour.red as u8, colour.green as u8, colour.blue as u8]);
+    }
+
+    img_buf.save(filename)?;
     Ok(())
 }
 
@@ -151,6 +157,7 @@ fn main() {
         });
     }
 
+    writeln!(std::io::stdout(), "Writing image...").unwrap();
     write_image(&args[1], &pixels, bounds).expect("error writing PNG file");
 }
 

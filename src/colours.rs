@@ -1,10 +1,10 @@
 pub mod gradient {
 
-    #[derive(Debug, PartialEq)]
+    #[derive(Debug, PartialEq, Clone)]
     pub struct RGBColour {
-        red: i16,
-        green: i16,
-        blue: i16
+        pub red: i16,
+        pub green: i16,
+        pub blue: i16
     }
 
     pub fn interpolate_colour(colour1: &RGBColour, colour2: &RGBColour, factor: f64) -> RGBColour {
