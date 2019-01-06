@@ -10,6 +10,7 @@ use std::fs::File;
 use std::str::FromStr;
 use std::io::Write;
 
+mod colours;
 
 fn parse_pair<T: FromStr>(s: &str, separator: char) -> Option<(T, T)> {
     match s.find(separator) {
