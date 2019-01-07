@@ -107,12 +107,16 @@ fn write_image(filename: &str, pixels: &[u8], bounds: (usize, usize)) -> Result<
         &colours::gradient::RGBColour { red: 255, green: 153, blue: 0},
         &colours::gradient::RGBColour { red: 35, green: 47, blue: 62 },
         256);
+    let colour_limit = colours::gradient::RGBColour{ red: 0, green: 0, blue: 0 };
 
     let mut img_buf: image::RgbImage = image::ImageBuffer::new(bounds.0 as u32, bounds.1 as u32);
 
     for (x, y, pixel) in img_buf.enumerate_pixels_mut() {
         let index = y as usize * bounds.0 + x as usize;
-        let colour = &colour_gradient[pixels[index] as usize];
+        let colour: &colours::gradient::RGBColour = match pixels[index] {
+            0 => &colour_limit,
+            _ => &colour_gradient[pixels[index] as usize]
+        };
         *pixel = image::Rgb([colour.red as u8, colour.green as u8, colour.blue as u8]);
     }
 
